@@ -4,6 +4,7 @@ from fastapi import FastAPI
 # Configure structlog
 structlog.configure(
     processors=[
+        structlog.contextvars.merge_contextvars,  # Merges context from contextvars
         structlog.processors.add_log_level,  # Add log level to each log
         structlog.processors.TimeStamper(fmt="iso"),  # Add timestamp
         structlog.processors.JSONRenderer()  # Output as JSON
@@ -24,7 +25,11 @@ def fetch_from_db():
 
 @app.get("/users/{user_id}")
 async def get_user(user_id: int):
-    
+
+    # Bind context to contextvars - affects ALL loggers in this request  
+    structlog.contextvars.clear_contextvars() # Clear any previous context 
+    structlog.contextvars.bind_contextvars(user_id=user_id)
+
     logger.info("request_received")
     validate_user()
     data = fetch_from_db()
