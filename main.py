@@ -10,21 +10,26 @@ structlog.configure(
     ]
 )
 
-# Create a logger
-logger = structlog.get_logger()
-
+logger = structlog.get_logger(__name__)
 # Create FastAPI app
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    logger.info("root_endpoint_called")
-    return {"message": "Hello World"}
+def validate_user():
+    logger.info("validating_user")  # Notice: no user_id needed!
+    return True
+
+def fetch_from_db():
+    logger.info("fetching_from_database")  # No user_id here either!
+    return {"name": "John"}
 
 @app.get("/users/{user_id}")
 async def get_user(user_id: int):
-    logger.info("user_endpoint_called", user_id=user_id)
-    return {"user_id": user_id, "name": "John Doe"}
+    
+    logger.info("request_received")
+    validate_user()
+    data = fetch_from_db()
+    logger.info("returning_data")
+    return data
 
 # Run the server when script is executed
 if __name__ == "__main__":
