@@ -1,7 +1,7 @@
 import logging
 
 auth_logger = logging.getLogger(__name__)
-auth_logger.setLevel(logging.WARNING)
+# auth_logger.setLevel(logging.WARNING)
 
 
 def login(username):
