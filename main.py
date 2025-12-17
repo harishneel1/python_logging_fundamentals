@@ -1,5 +1,6 @@
 import structlog
 from fastapi import FastAPI
+import uuid
 
 # Configure structlog
 structlog.configure(
@@ -26,9 +27,11 @@ def fetch_from_db():
 @app.get("/users/{user_id}")
 async def get_user(user_id: int):
 
+    request_id = str(uuid.uuid4())
+
     # Bind context to contextvars - affects ALL loggers in this request  
     structlog.contextvars.clear_contextvars() # Clear any previous context 
-    structlog.contextvars.bind_contextvars(user_id=user_id)
+    structlog.contextvars.bind_contextvars(user_id=user_id, request_id=request_id)
 
     logger.info("request_received")
     validate_user()
